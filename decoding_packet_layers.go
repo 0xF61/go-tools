@@ -91,5 +91,4 @@ func printPacketInfo(packet gopacket.Packet) {
 			fmt.Println("HTTP found!")
 		}
 	}
-
 }
