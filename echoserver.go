@@ -1,7 +1,8 @@
 package main
 
 import (
-	"io"
+	"bufio"
+	//"io"
 	"log"
 	"net"
 )
@@ -9,25 +10,47 @@ import (
 func echo(conn net.Conn) {
 	defer conn.Close()
 
+	/*
+	 *  for {
+	 *    b := make([]byte, 512)
+	 *    size, err := conn.Read(b[0:])
+	 *    if err == io.EOF {
+	 *      log.Println("Client Disconnected")
+	 *      break
+	 *    }
+	 *
+	 *    if err != nil {
+	 *      log.Println("Unexpected Error")
+	 *    }
+	 *
+	 *    log.Printf("Received %d bytes: %s", size, string(b))
+	 *
+	 *    log.Printf("Writing Data")
+	 *    if _, err := conn.Write(b[0:size]); err != nil {
+	 *      log.Fatalln("Unable to write data")
+	 *    }
+	 *  }
+	 */
+
 	for {
-		b := make([]byte, 512)
-		size, err := conn.Read(b[0:])
-		if err == io.EOF {
-			log.Println("Client Disconnected")
-			break
-		}
 
+		reader := bufio.NewReader(conn)
+		s, err := reader.ReadString('\n')
 		if err != nil {
-			log.Println("Unexpected Error")
+			log.Fatalln("Unable to read data")
 		}
+		log.Println("Read %d bytes: %s", len(s), s)
 
-		log.Printf("Received %d bytes: %s", size, string(b))
-
-		log.Printf("Writing Data")
-		if _, err := conn.Write(b[0:size]); err != nil {
+		log.Println("Writing Data")
+		writer := bufio.NewWriter(conn)
+		if _, err := writer.WriteString(s); err != nil {
 			log.Fatalln("Unable to write data")
 		}
+		log.Println("Read %d bytes: %s", len(s), s)
+
+		writer.Flush()
 	}
+
 }
 
 func main() {
